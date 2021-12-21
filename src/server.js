@@ -10,13 +10,14 @@ import {
 } from "./errorHandlers.js";
 import cors from "cors";
 import passport from "passport";
-/* import GoogleStrategy from "./auth/oauth.js"; */
+import GoogleStrategy from "./auth/oauth.js";
+import usersRouter from "./services/users/index.js";
 
 const server = express();
 
 const port = process.env.PORT;
 // ********************************* MIDDLEWARES ***************************************
-/* passport.use("google", GoogleStrategy) */
+passport.use("google", GoogleStrategy);
 
 server.use(cors());
 server.use(express.json());
@@ -24,7 +25,7 @@ server.use(passport.initialize());
 
 // ********************************* ROUTES ********************************************
 
-//server.use("/users", usersRouter);
+server.use("/users", usersRouter);
 
 // ********************************* ERROR HANDLERS ************************************
 server.use(unauthorizedHandler);

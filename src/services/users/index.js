@@ -1,7 +1,7 @@
 import express from "express";
 import UserModel from "./schema.js";
 import BlogsModel from "./schema.js";
-import { basicAuthMiddleware } from "../../auth/basic.js";
+
 import { adminOnlyMiddleware } from "../../auth/admin.js";
 import {
   JWTAuthenticate,
@@ -95,7 +95,7 @@ usersRouter.get("/:id", JWTAuthMiddleware, async (req, res, next) => {
   }
 });
 
-usersRouter.put("/me", basicAuthMiddleware, async (req, res, next) => {
+usersRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
   try {
     /*  req.user.name = "John"; */
     const id = req.user._id.toString();
@@ -115,7 +115,7 @@ usersRouter.put("/me", basicAuthMiddleware, async (req, res, next) => {
 
 usersRouter.put(
   "/:id",
-  basicAuthMiddleware,
+
   adminOnlyMiddleware,
   async (req, res, next) => {
     try {
@@ -142,7 +142,7 @@ usersRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
 
 usersRouter.delete(
   "/:id",
-  basicAuthMiddleware,
+  JWTAuthMiddleware,
   adminOnlyMiddleware,
   async (req, res, next) => {
     const id = req.user._id.toString();
