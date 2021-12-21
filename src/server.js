@@ -12,6 +12,7 @@ import cors from "cors";
 import passport from "passport";
 import GoogleStrategy from "./auth/oauth.js";
 import usersRouter from "./services/users/index.js";
+import tvVideoRouter from "./services/tv/index.js";
 
 const server = express();
 
@@ -26,6 +27,7 @@ server.use(passport.initialize());
 // ********************************* ROUTES ********************************************
 
 server.use("/users", usersRouter);
+server.use("/video", tvVideoRouter);
 
 // ********************************* ERROR HANDLERS ************************************
 server.use(unauthorizedHandler);

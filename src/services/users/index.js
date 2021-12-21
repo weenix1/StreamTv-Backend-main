@@ -1,7 +1,7 @@
 import express from "express";
 import UserModel from "./schema.js";
 import BlogsModel from "./schema.js";
-
+import createHttpError from "http-errors";
 import { adminOnlyMiddleware } from "../../auth/admin.js";
 import {
   JWTAuthenticate,
@@ -17,6 +17,32 @@ usersRouter.post("/register", async (req, res, next) => {
     const newUser = new UserModel(req.body);
     const { _id } = await newUser.save();
     res.send({ _id });
+  } catch (error) {
+    next(error);
+  }
+});
+
+usersRouter.post("/", async (req, res, next) => {
+  try {
+    // 1. Get credentials from req.body
+    const { firstName, surName, email, password } = req.body;
+
+    // 2. Verify credentials
+    const user = await UserModel.checkCredentials(
+      firstName,
+      surName,
+      email,
+      password
+    );
+
+    if (user) {
+      // 3. If credentials are fine we are going to generate an access token
+      const { accessToken, refreshToken } = await JWTAuthenticate(user);
+      res.send({ accessToken, refreshToken });
+    } else {
+      // 4. If they are not --> error (401)
+      next(createHttpError(401, "Credentials not ok!"));
+    }
   } catch (error) {
     next(error);
   }
