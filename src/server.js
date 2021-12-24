@@ -27,7 +27,7 @@ server.use(passport.initialize());
 // ********************************* ROUTES ********************************************
 
 server.use("/users", usersRouter);
-server.use("/video", tvVideoRouter);
+server.use("/videos", tvVideoRouter);
 
 // ********************************* ERROR HANDLERS ************************************
 server.use(unauthorizedHandler);

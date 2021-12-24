@@ -30,7 +30,8 @@
     "mongoose": "^6.1.2",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
-    "query-to-mongo": "^0.10.1"
+    "query-to-mongo": "^0.10.1",
+    "thumbsupply": "^0.4.0"
   },
   "devDependencies": {
     "dotenv": "^10.0.0",
