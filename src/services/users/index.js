@@ -9,8 +9,31 @@ import {
 } from "../../auth/tools.js";
 import { JWTAuthMiddleware } from "../../auth/token.js";
 import passport from "passport";
+import sgMail from "@sendgrid/mail";
 
 const usersRouter = express.Router();
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const sendEmailToUser = async (emailRecipient, pdf, name) => {
+  const msg = {
+    to: emailRecipient,
+    from: process.env.MY_EMAIL, // Use the email address or domain you verified above
+    subject: "Sending with Twilio SendGrid is Fun",
+    text: "and easy to do anywhere, even with Node.js",
+    html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+    attachments: [
+      {
+        content: pdf,
+        filename: `${name}`,
+        type: "application/pdf",
+        disposition: "attachment",
+      },
+    ],
+  };
+
+  await sgMail.send(msg);
+};
 
 usersRouter.post("/register", async (req, res, next) => {
   try {

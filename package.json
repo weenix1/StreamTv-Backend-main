@@ -20,17 +20,22 @@
   },
   "homepage": "https://github.com/weenix1/StreamTv-Backend#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.0",
     "atob": "^2.1.2",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "express-list-endpoints": "^6.0.0",
+    "ffmpeg": "^0.0.4",
+    "ffprobe": "^1.1.2",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
+    "media-thumbnail": "^1.0.0",
     "mongoose": "^6.1.2",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
     "query-to-mongo": "^0.10.1",
+    "stripe": "^8.195.0",
     "thumbsupply": "^0.4.0"
   },
   "devDependencies": {

@@ -13,6 +13,7 @@ import passport from "passport";
 import GoogleStrategy from "./auth/oauth.js";
 import usersRouter from "./services/users/index.js";
 import tvVideoRouter from "./services/tv/index.js";
+import paymentRouter from "./services/payments/index.js";
 
 const server = express();
 
@@ -28,6 +29,7 @@ server.use(passport.initialize());
 
 server.use("/users", usersRouter);
 server.use("/videos", tvVideoRouter);
+server.use("/payment", paymentRouter);
 
 // ********************************* ERROR HANDLERS ************************************
 server.use(unauthorizedHandler);
