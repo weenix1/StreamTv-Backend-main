@@ -14,6 +14,8 @@ import GoogleStrategy from "./auth/oauth.js";
 import usersRouter from "./services/users/index.js";
 import tvVideoRouter from "./services/tv/index.js";
 import paymentRouter from "./services/payments/index.js";
+import movieRouter from "./services/MoviesCloudinary/index.js";
+import videoRouter from "./services/AWSmovies/index.js";
 
 const server = express();
 
@@ -30,6 +32,8 @@ server.use(passport.initialize());
 server.use("/users", usersRouter);
 server.use("/videos", tvVideoRouter);
 server.use("/payment", paymentRouter);
+server.use("/movies", movieRouter);
+server.use("/awsVideos", videoRouter);
 
 // ********************************* ERROR HANDLERS ************************************
 server.use(unauthorizedHandler);

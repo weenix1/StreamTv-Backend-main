@@ -110,14 +110,14 @@ tvVideoRouter.get("/:id", (req, res) => {
     console.log(parts);
 
     const chunksize = end - start + 1;
-    const file = fs.createReadStream(path, { start, end });
-    const head = {
+    const file = fs.createReadStream(path /* { start, end } */);
+    /* const head = {
       "Content-Range": `bytes ${start}-${end}/${fileSize}`,
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize,
       "Content-Type": "video/mp4",
     };
-    res.writeHead(206, head);
+    res.writeHead(206, head); */
     file.pipe(res);
   } else {
     console.log("no range", range);
@@ -129,66 +129,5 @@ tvVideoRouter.get("/:id", (req, res) => {
     fs.createReadStream(path).pipe(res);
   }
 });
-
-//********** Another streaming route */
-/* tvVideoRouter.get("/video", (req, res) => {
-  const range = req.headers.range;
-  if (!range) {
-    res.status(400).send("requires Range header");
-  }
-
-  const videoPath = "assets/biggy.mp4";
-  const videoSize = fs.statSync("assets/biggy.mp4").size;
-
-  const CHUNK_SIZE = 10 ** 6; //1MB
-  const start = Number(range.replace(/\D/g, ""));
-  console.log("here is start", start);
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-
-  const contentLength = end - start + 1;
-  const headers = {
-    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-    "Accept-Ranges": "bytes",
-    "Content-Length": contentLength,
-    "Content-Type": "video/mp4",
-  };
-
-  res.writeHead(206, headers);
-  const videoStream = fs.createReadStream(videoPath, { start, end });
-  videoStream.pipe(res);
-}); */
-
-/* tvVideoRouter.get("/video", function (req, res) {
-  // Ensure there is a range given for the video
-  const range = req.headers.range;
-
-  // get video stats (about 61MB)
-  const videoPath = "bigbuck.mp4";
-  const videoSize = fs.statSync(videoPath).size;
-
-  // Parse Range
-  // Example: "bytes=32324-"
-  const CHUNK_SIZE = 10 ** 6; // 1MB
-  const start = Number(range.replace(/bytes=/, ""));
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-
-  // Create headers
-  const contentLength = end - start + 1;
-  const headers = {
-    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-    "Accept-Ranges": "bytes",
-    "Content-Length": contentLength,
-    "Content-Type": "video/mp4",
-  };
-
-  // HTTP Status 206 for Partial Content
-  res.writeHead(206, headers);
-
-  // create video read stream for this particular chunk
-  const videoStream = fs.createReadStream(videoPath, { start, end });
-
-  // Stream the video chunk to the client
-  videoStream.pipe(res);
-}); */
 
 export default tvVideoRouter;
