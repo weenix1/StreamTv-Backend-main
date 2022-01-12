@@ -3,7 +3,7 @@ import fs from "fs";
 import util from "util";
 import multer from "multer";
 import { uploadFile, getFileStream } from "../S3/index.js";
-import MovieModel from "./schema.js";
+import videoModel from "./schema.js";
 
 const unlinkFile = util.promisify(fs.unlink);
 
