@@ -12,7 +12,7 @@ import cors from "cors";
 import passport from "passport";
 import GoogleStrategy from "./auth/oauth.js";
 import usersRouter from "./services/users/index.js";
-import tvVideoRouter from "./services/tv/index.js";
+/* import tvVideoRouter from "./services/tv/index.js"; */
 import paymentRouter from "./services/payments/index.js";
 
 import videoRouter from "./services/AWSmovies/index.js";
@@ -30,7 +30,7 @@ server.use(passport.initialize());
 // ********************************* ROUTES ********************************************
 
 server.use("/users", usersRouter);
-server.use("/videos", tvVideoRouter);
+/* server.use("/videos", tvVideoRouter); */
 server.use("/payment", paymentRouter);
 
 server.use("/awsVideos", videoRouter);
