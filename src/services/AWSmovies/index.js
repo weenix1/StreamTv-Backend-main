@@ -142,14 +142,16 @@ videoRouter.post("/", upload.single("video"), async (req, res) => {
     name: name,
     description: description,
     poster: poster,
-    videoUrl: `/awsVideos/video/${result.Key}`,
+    //videoUrl: `/awsVideos/video/${result.Key}`,
+    videoUrl: result.Location,
     category: category,
     /*  { $set: { videoUrl: `/videos/${result.Key}` } } */
   });
 
   await newMovie.save();
   /* const description = req.body.description; */
-  res.send({ videoPath: `/awsVideos/video/${result.Key}` });
+  res.send({ videoPath: `${result.Location}` });
+  /*  res.send({ videoPath: `/awsVideos/video/${result.Location}` });  */
 });
 
 export default videoRouter;
