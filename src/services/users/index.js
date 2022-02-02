@@ -114,6 +114,7 @@ usersRouter.get(
 
       res.redirect(
         `${process.env.FE_URL}?accessToken=${req.user.tokens.accessToken}&refreshToken=${req.user.tokens.refreshToken}`
+        /* use process.env.API_URL for the deployed app */
       );
     } catch (error) {
       next(error);
