@@ -16,6 +16,7 @@ import usersRouter from "./services/users/index.js";
 import paymentRouter from "./services/payments/index.js";
 
 import videoRouter from "./services/AWSmovies/index.js";
+import subscriptionRouter from "./services/Subscription/index.js";
 
 const server = express();
 
@@ -34,6 +35,7 @@ server.use("/users", usersRouter);
 server.use("/payment", paymentRouter);
 
 server.use("/awsVideos", videoRouter);
+server.use("/subscription", subscriptionRouter);
 
 // ********************************* ERROR HANDLERS ************************************
 server.use(unauthorizedHandler);
