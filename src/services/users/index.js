@@ -250,3 +250,11 @@ usersRouter.post("/refreshToken", async (req, res, next) => {
 });
 
 export default usersRouter;
+
+/* generating random string
+$ node // type node and press enter
+Welcome to Node.js v16.10.0.
+Type ".help" for more information.
+> require("crypto").randomBytes(64).toString("hex") // type this
+
+ */
