@@ -1,143 +1,55 @@
 import express from "express";
-import path, { resolve } from "path";
+
 import Stripe from "stripe";
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-const YOUR_DOMAIN = process.env.MY_DOMAIN;
 
 const subscriptionRouter = express.Router();
 
-/* subscriptionRouter.post("/create-checkout-session", async (req, res) => {
-  const session = await stripe.checkout.sessions.create({
-    success_url:
-      "https://streamtv-eta.vercel.app/success?id={CHECKOUT_SESSION_ID}",
-    cancel_url: "https://streamtv-eta.vercel.app/cancel",
-    payment_method_types: [""],
-    mode: "",
-    line_items: [
-      {
-        price: "prod_L7dpBdL02xCLCh",
-        quantity: req.body.quantity,
-      },
-    ],
-  });
-  res.json({
-    id: session.id,
-  });
-}); */
+subscriptionRouter.post("/pay", async (req, res) => {
+  const { email } = req.body;
 
-subscriptionRouter.get("/success", (req, res) => {
-  const path = resolve(process.env.STATIC_DIR);
-  res.sendFile(path);
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: 5000,
+    currency: "usd",
+    // Verify your integration in this guide by including this parameter
+    metadata: { integration_check: "accept_a_payment" },
+    receipt_email: email,
+  });
+
+  res.json({ client_secret: paymentIntent["client_secret"] });
 });
 
-subscriptionRouter.post("/create-checkout-session", async (req, res) => {
-  const prices = await stripe.prices.list({
-    lookup_keys: [req.body.lookup_key],
-    expand: ["data.product"],
-  });
-  const session = await stripe.checkout.sessions.create({
-    billing_address_collection: "auto",
-    line_items: [
-      {
-        price: prices.data[0].id,
-        // For metered billing, do not pass quantity
-        quantity: 1,
-      },
-    ],
-    mode: "subscription",
-    success_url: `${YOUR_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${YOUR_DOMAIN}/cancel`,
+subscriptionRouter.post("/sub", async (req, res) => {
+  const { email, payment_method } = req.body;
+
+  const customer = await stripe.customers.create({
+    payment_method: payment_method,
+    email: email,
+    invoice_settings: {
+      default_payment_method: payment_method,
+    },
   });
 
-  /* res.redirect(303, session.url); */
-  res.send({ url: session.url });
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ plan: "plan_G......" }],
+    expand: ["latest_invoice.payment_intent"],
+  });
+
+  const status = subscription["latest_invoice"]["payment_intent"]["status"];
+  const client_secret =
+    subscription["latest_invoice"]["payment_intent"]["client_secret"];
+
+  res.json({ client_secret: client_secret, status: status });
 });
 
-subscriptionRouter.post("/create-portal-session", async (req, res) => {
-  // For demonstration purposes, we're using the Checkout session to retrieve the customer ID.
-  // Typically this is stored alongside the authenticated user in your database.
-  const { session_id } = req.body;
-  const checkoutSession = await stripe.checkout.sessions.retrieve(session_id);
-
-  // This is the url to which the customer will be redirected when they are done
-  // managing their billing with the portal.
-  const returnUrl = YOUR_DOMAIN;
-
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer: checkoutSession.customer,
-    return_url: returnUrl,
-  });
-
-  res.redirect(303, portalSession.url);
+subscriptionRouter.delete("/cancel-subscription", async (req, res) => {
+  // Delete the subscription
+  const deletedSubscription = await stripe.subscriptions.del(
+    req.body.subscriptionId
+  );
+  res.send(deletedSubscription);
 });
-
-subscriptionRouter.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  (request, response) => {
-    const event = request.body;
-    // Replace this endpoint secret with your endpoint's unique secret
-    // If you are testing with the CLI, find the secret by running 'stripe listen'
-    // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-    // at https://dashboard.stripe.com/webhooks
-    /* const endpointSecret = "whsec_12345"; */
-    // Only verify the event if you have an endpoint secret defined.
-    // Otherwise use the basic event deserialized with JSON.parse
-    if (webhookSecret) {
-      // Get the signature sent by Stripe
-      const signature = request.headers["stripe-signature"];
-      try {
-        event = stripe.webhooks.constructEvent(
-          request.body,
-          signature,
-          webhookSecret
-        );
-      } catch (err) {
-        console.log(`⚠️  Webhook signature verification failed.`, err.message);
-        return response.sendStatus(400);
-      }
-    }
-    let subscription;
-    let status;
-    // Handle the event
-    switch (event.type) {
-      case "customer.subscription.trial_will_end":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription trial ending.
-        // handleSubscriptionTrialEnding(subscription);
-        break;
-      case "customer.subscription.deleted":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription deleted.
-        // handleSubscriptionDeleted(subscriptionDeleted);
-        break;
-      case "customer.subscription.created":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription created.
-        // handleSubscriptionCreated(subscription);
-        break;
-      case "customer.subscription.updated":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription update.
-        // handleSubscriptionUpdated(subscription);
-        break;
-      default:
-        // Unexpected event type
-        console.log(`Unhandled event type ${event.type}.`);
-    }
-    // Return a 200 response to acknowledge receipt of the event
-    response.send();
-  }
-);
 
 export default subscriptionRouter;
